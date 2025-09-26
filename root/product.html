@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Produtos - O Grande Mestre</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header>
+    <img src="assets/images/logo-gm.png" alt="Logo da Loja" class="logo">
+    <h1>Catálogo de Produtos</h1>
+
+    <div class="social-links">
+      <a href="#">Instagram</a>
+      <a href="#">Facebook</a>
+      <a href="#">WhatsApp</a>
+    </div>
+
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="product.html">Produtos</a></li>
+        <li><a href="cart.html">Carrinho (<span id="cart-count">0</span>)</a></li>
+        <li><a href="checkout.html" id="checkout-link">Checkout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Filtro de categorias -->
+  <div class="category-filter">
+    <button data-category="all" class="active">Todos</button>
+    <button data-category="pratos">Pratos</button>
+    <button data-category="sucos">Sucos</button>
+    <button data-category="refrigerantes">Refrigerantes</button>
+  </div>
+
+  <!-- Barra de busca -->
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Buscar produto..." />
+  </div>
+
+  <main>
+    <!-- ====== Categoria: Sucos ====== -->
+    <section class="category" data-category="sucos">
+      <h2>Sucos</h2>
+      <ul>
+        <li>
+          <img src="assets/images/suco-laranja.webp" alt="Suco de Laranja" class="product-image">
+          <div>
+            <h3>Suco de Laranja</h3>
+            <p>R$ 6,00</p>
+            <button class="btn-add" data-name="Suco de Laranja" data-price="6.00">Adicionar ao Carrinho</button>
+          </div>
+        </li>
+        <li>
+          <img src="assets/images/suco-uva.webp" alt="Suco de Uva" class="product-image">
+          <div>
+            <h3>Suco de Uva</h3>
+            <p>R$ 5,00</p>
+            <button class="btn-add" data-name="Suco de Uva" data-price="5.00">Adicionar ao Carrinho</button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ====== Categoria: Refrigerantes ====== -->
+    <section class="category" data-category="refrigerantes">
+      <h2>Refrigerantes</h2>
+      <ul>
+        <li>
+          <img src="assets/images/coca-cola.jpeg" alt="Coca-Cola" class="product-image">
+          <div>
+            <h3>Coca-Cola 350ml</h3>
+            <p>R$ 6,00</p>
+            <button class="btn-add" data-name="Coca-Cola 350ml" data-price="6.00">Adicionar ao Carrinho</button>
+          </div>
+        </li>
+        <li>
+          <img src="assets/images/guarana.jpg" alt="Guaraná Antarctica" class="product-image">
+          <div>
+            <h3>Guaraná Antarctica 350ml</h3>
+            <p>R$ 4,50</p>
+            <button class="btn-add" data-name="Guaraná Antarctica 350ml" data-price="4.50">Adicionar ao Carrinho</button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ====== Categoria: Pratos Principais ====== -->
+    <section class="category" data-category="pratos">
+      <h2>Pratos Principais</h2>
+      <ul>
+        <li>
+          <img src="assets/images/arrumadinho-charque.jpeg" alt="Arrumadinho com Charque" class="product-image">
+          <div>
+            <h3>Arrumadinho com Charque</h3>
+            <p>R$ 22,00</p>
+            <button class="btn-add" data-name="Arrumadinho com Charque" data-price="22.00">Adicionar ao Carrinho</button>
+          </div>
+        </li>
+        <li>
+          <img src="assets/images/peitinho-mocoto.jpeg" alt="Cuscuz com Mocotó" class="product-image">
+          <div>
+            <h3>Cuscuz com Mocotó</h3>
+            <p>R$ 20,00</p>
+            <button class="btn-add" data-name="Cuscuz com Mocotó" data-price="20.00">Adicionar ao Carrinho</button>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Feedback de ação (toast) -->
+  <div id="feedback" class="feedback"></div>
+
+  <script>
+    const cartCount = document.getElementById("cart-count");
+    const feedback = document.getElementById("feedback");
+    const checkoutLink = document.getElementById("checkout-link");
+
+    function updateCartUI() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = totalQty;
+    }
+    updateCartUI();
+
+    function showFeedback(message) {
+      feedback.innerHTML = `
+        ${message}
+        <a href="cart.html" class="view-cart-btn">Ver Carrinho</a>
+      `;
+      feedback.className = "feedback show success";
+      feedback.style.display = "block";
+
+      setTimeout(() => {
+        feedback.style.display = "none";
+        feedback.className = "feedback";
+      }, 3000);
+    }
+
+    function addToCart(name, price) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existing = cart.find(item => item.name === name);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ name, price: parseFloat(price), quantity: 1 });
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartUI();
+      showFeedback(`${name} foi adicionado ao carrinho!`);
+    }
+
+    document.querySelectorAll(".btn-add").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const name = btn.dataset.name;
+        const price = btn.dataset.price;
+        addToCart(name, price);
+      });
+    });
+
+    // Validação de checkout
+    checkoutLink.addEventListener("click", (e) => {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if (cart.length === 0) {
+        e.preventDefault();
+        showFeedback("O carrinho está vazio. Adicione produtos antes de finalizar.");
+      }
+    });
+
+    // Filtro por categoria
+    const filterButtons = document.querySelectorAll(".category-filter button");
+    const categories = document.querySelectorAll("section.category");
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        filterButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const category = button.getAttribute("data-category");
+
+        categories.forEach(section => {
+          section.style.display = category === "all" || section.getAttribute("data-category") === category
+            ? "block"
+            : "none";
+        });
+      });
+    });
+
+    // Busca por nome do produto
+    const searchInput = document.getElementById("search-input");
+
+    searchInput.addEventListener("input", () => {
+      const filter = searchInput.value.toLowerCase();
+      categories.forEach(category => {
+        const items = category.querySelectorAll("li");
+        let hasVisible = false;
+
+        items.forEach(item => {
+          const name = item.querySelector("h3").textContent.toLowerCase();
+          if (name.includes(filter)) {
+            item.style.display = "flex";
+            hasVisible = true;
+          } else {
+            item.style.display = "none";
+          }
+        });
+
+        category.style.display = hasVisible ? "block" : "none";
+      });
+    });
+  </script>
+</body>
+</html>
